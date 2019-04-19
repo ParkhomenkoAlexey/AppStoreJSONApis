@@ -10,6 +10,8 @@ import UIKit
 
 class AppsSearchController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
+    fileprivate var appResults = [Result]()
+    
     init() {
         let layout = UICollectionViewFlowLayout()
         super.init(collectionViewLayout: layout)
@@ -20,37 +22,30 @@ class AppsSearchController: UICollectionViewController, UICollectionViewDelegate
     }
     
     fileprivate func fetchITunesApps() {
-        let urlString = "https://itunes.apple.com/search?term=jack+johnson"
-        guard let url = URL(string: urlString) else { return }
-        URLSession.shared.dataTask(with: url) { (data, response, error) in
-            if let error = error {
-                print("Failed to fetch apps:", error)
+        Service.shared.fetchApps { (results, error) in
+            
+            if let err = error {
+                print("Failed to fetch apps:", err)
                 return
             }
             
-            
-            guard let data = data else { return }
-            
-            do {
-                let searchResult = try JSONDecoder().decode(SearchResult.self, from: data)
-                searchResult.results.forEach({print($0.trackName, $0.primaryGenreName)})
-            } catch let jsonErr {
-                print("Failed to decode JSON", jsonErr)
+            self.appResults = results
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
             }
-            
-            
-            
-            
-        }.resume()
+        }
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return appResults.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SearchResultCell.reuseId, for: indexPath) as! SearchResultCell
-        cell.nameLabel.text = "HERE IS MY APP NAME"
+        let appResult = appResults[indexPath.item]
+        cell.nameLabel.text = appResult.trackName
+        cell.categoryLabel.text = appResult.primaryGenreName
+        cell.ratingsLabel.text = "Raiting: \(appResult.averageUserRating ?? 0)"
         return cell
     }
     
@@ -61,6 +56,4 @@ class AppsSearchController: UICollectionViewController, UICollectionViewDelegate
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-
 }
