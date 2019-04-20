@@ -9,9 +9,19 @@
 import UIKit
 import SDWebImage
 
-class AppsSearchController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+class AppsSearchController: UICollectionViewController {
     
     fileprivate var appResults = [Result]()
+    fileprivate let searchController = UISearchController(searchResultsController: nil)
+    fileprivate var timer: Timer?
+    fileprivate let enterSearchTermLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Please enter search term above..."
+        label.textAlignment = .center
+        label.font = UIFont.boldSystemFont(ofSize: 20)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
     
     init() {
         let layout = UICollectionViewFlowLayout()
@@ -19,11 +29,26 @@ class AppsSearchController: UICollectionViewController, UICollectionViewDelegate
         collectionView.backgroundColor = .white
         
         collectionView.register(SearchResultCell.self, forCellWithReuseIdentifier: SearchResultCell.reuseId)
-        fetchITunesApps()
+        setupEnterLabel()
+        setupSearchBar()
+    }
+    
+    fileprivate func setupEnterLabel() {
+        collectionView.addSubview(enterSearchTermLabel)
+        enterSearchTermLabel.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor).isActive = true
+        enterSearchTermLabel.topAnchor.constraint(equalTo: collectionView.topAnchor, constant: 50).isActive = true
+    }
+    
+    fileprivate func setupSearchBar() {
+        navigationItem.searchController = self.searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
+        definesPresentationContext = true
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.searchBar.delegate = self
     }
     
     fileprivate func fetchITunesApps() {
-        Service.shared.fetchApps { (results, error) in
+        Service.shared.fetchApps(searchTerm: "Twitter") { (results, error) in
             
             if let err = error {
                 print("Failed to fetch apps:", err)
@@ -37,6 +62,7 @@ class AppsSearchController: UICollectionViewController, UICollectionViewDelegate
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        enterSearchTermLabel.isHidden = appResults.count != 0
         return appResults.count
     }
     
@@ -46,11 +72,28 @@ class AppsSearchController: UICollectionViewController, UICollectionViewDelegate
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return .init(width: collectionView.frame.width, height: 350)
-    }
-    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension AppsSearchController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { (_) in
+            Service.shared.fetchApps(searchTerm: searchText) { (res, err) in
+                self.appResults = res
+                DispatchQueue.main.async {
+                    self.collectionView.reloadData()
+                }
+            }
+        })
+    }
+}
+
+extension AppsSearchController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return .init(width: collectionView.frame.width, height: 350)
     }
 }
