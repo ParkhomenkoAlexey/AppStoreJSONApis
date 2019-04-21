@@ -21,6 +21,8 @@ class AppsHorizontalController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.backgroundColor = .white
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.showsVerticalScrollIndicator = false
         collectionView.register(AppRowCell.self, forCellWithReuseIdentifier: AppRowCell.reuseid)
     }
 
