@@ -13,7 +13,7 @@ class AppsHeaderControllerCell: UICollectionViewCell {
     static let reuseId = "AppsHeaderControllerCell"
     
     let companyLabel = UILabel(text: "Facebook", font: .boldSystemFont(ofSize: 12))
-    let textLabel = UILabel(text: "Keeping up with friend is faster than ever", font: .systemFont(ofSize: 30))
+    let textLabel = UILabel(text: "Keeping up with friend is faster than ever", font: .systemFont(ofSize: 24))
     let imageView = UIImageView(cornerRadius: 8)
     
     
