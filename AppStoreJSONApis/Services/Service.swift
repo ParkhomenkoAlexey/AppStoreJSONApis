@@ -34,17 +34,34 @@ class Service {
         }.resume()
     }
     
+    
+    func fetchTopPaid(completion: @escaping (AppGroup?, Error?) -> ()) {
+        let urlString = "https://rss.itunes.apple.com/api/v1/us/ios-apps/top-paid/all/25/explicit.json"
+        fetchAppGroup(urlString: urlString, completion: completion)
+    }
+    
     func fetchGames(completion: @escaping (AppGroup?, Error?) -> ()) {
-        guard let url = URL(string: "https://rss.itunes.apple.com/api/v1/us/ios-apps/new-apps-we-love/all/50/explicit.json") else { return }
+        let urlString = "https://rss.itunes.apple.com/api/v1/us/ios-apps/new-apps-we-love/all/25/explicit.json"
+        fetchAppGroup(urlString: urlString, completion: completion)
+    }
+    
+    func fetchTopGrossing(completion: @escaping (AppGroup?, Error?) -> ()) {
+        
+        let urlString = "https://rss.itunes.apple.com/api/v1/us/ios-apps/top-grossing/all/25/explicit.json"
+        fetchAppGroup(urlString: urlString, completion: completion)
+        
+    }
+    
+    func fetchAppGroup(urlString: String, completion: @escaping (AppGroup?, Error?) -> Void) {
+        guard let url = URL(string: urlString) else { return }
         
         URLSession.shared.dataTask(with: url) { (data, response, error) in
-    
+            
             if let error = error {
                 print("Failed to fetch apps:", error)
                 completion(nil, error)
                 return
             }
-            
             do {
                 // success
                 let fetchResult = try JSONDecoder().decode(AppGroup.self, from: data!)
@@ -53,8 +70,7 @@ class Service {
                 print("Failed to decode JSON", jsonErr)
                 completion(nil, jsonErr)
             }
-            
-            
-        }.resume()
+            }.resume()
     }
+    
 }

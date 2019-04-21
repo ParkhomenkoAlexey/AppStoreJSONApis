@@ -11,6 +11,8 @@ import UIKit
 
 class AppsPageController: UICollectionViewController {
     
+    var groups = [AppGroup]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -24,18 +26,58 @@ class AppsPageController: UICollectionViewController {
         fetchData()
     }
     
-    var editorsChoiceGames: AppGroup?
-    
     fileprivate func fetchData() {
-        print("Fetching new JSON DATA somehow...")
+        
+        var group1: AppGroup?
+        var group2: AppGroup?
+        var group3: AppGroup?
+
+        let dispatchGroup = DispatchGroup()
+        
+        dispatchGroup.enter()
         Service.shared.fetchGames { (appGroup, error) in
-            self.editorsChoiceGames = appGroup
-            DispatchQueue.main.async {
-                self.collectionView.reloadData()
-            }
-            
+            dispatchGroup.leave()
+            group1 = appGroup
         }
         
+        dispatchGroup.enter()
+        Service.shared.fetchTopGrossing { (appGroup, error) in
+            dispatchGroup.leave()
+            group2 = appGroup
+        }
+        
+        dispatchGroup.enter()
+        Service.shared.fetchTopPaid { (appGroup, error) in
+            dispatchGroup.leave()
+            group3 = appGroup
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            print("Сompleted your dispatch group task ...")
+            guard let group1 = group1, let group2 = group2, let group3 = group3 else { return }
+            self.groups.append(group1)
+            self.groups.append(group2)
+            self.groups.append(group3)
+            self.collectionView.reloadData()
+        }
+    }
+
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return groups.count
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AppsGroupCell.reuseId, for: indexPath) as! AppsGroupCell
+        
+        let appGroup = groups[indexPath.item]
+        cell.titleLabel.text = appGroup.feed.title
+        cell.horizontalController.appGroup = appGroup
+        cell.horizontalController.collectionView.reloadData()
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return .init(top: 16, left: 0, bottom: 0, right: 0)
     }
     
     // 2 Header
@@ -46,23 +88,8 @@ class AppsPageController: UICollectionViewController {
     
     // 3 Header
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return .init(width: view.frame.width, height: 300)
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AppsGroupCell.reuseId, for: indexPath) as! AppsGroupCell
-        cell.titleLabel.text = editorsChoiceGames?.feed.title
-        cell.horizontalController.appGroup = editorsChoiceGames
-        cell.horizontalController.collectionView.reloadData()
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return .init(top: 16, left: 0, bottom: 0, right: 0)
+        //        return .init(width: view.frame.width, height: 300)
+        return .zero
     }
     
     init() {
