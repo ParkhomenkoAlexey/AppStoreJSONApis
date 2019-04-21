@@ -1,5 +1,5 @@
 //
-//  AppsSearchController.swift
+//  SearchController.swift
 //  AppStoreJSONApis
 //
 //  Created by Алексей Пархоменко on 19/04/2019.
@@ -9,7 +9,7 @@
 import UIKit
 import SDWebImage
 
-class AppsSearchController: UICollectionViewController {
+class SearchController: UICollectionViewController {
     
     fileprivate var appResults = [Result]()
     fileprivate let searchController = UISearchController(searchResultsController: nil)
@@ -77,7 +77,7 @@ class AppsSearchController: UICollectionViewController {
     }
 }
 
-extension AppsSearchController: UISearchBarDelegate {
+extension SearchController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
         timer?.invalidate()
@@ -92,7 +92,7 @@ extension AppsSearchController: UISearchBarDelegate {
     }
 }
 
-extension AppsSearchController: UICollectionViewDelegateFlowLayout {
+extension SearchController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return .init(width: collectionView.frame.width, height: 350)
     }
