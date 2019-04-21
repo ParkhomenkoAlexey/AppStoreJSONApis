@@ -18,18 +18,28 @@ class AppsPageController: UICollectionViewController {
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.showsVerticalScrollIndicator = false
         collectionView.register(AppsGroupCell.self, forCellWithReuseIdentifier: AppsGroupCell.reuseId)
-        
-        // 1
+        // 1 Header
         collectionView.register(AppsPageHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: AppsPageHeader.reuseId)
+        
+        fetchData()
     }
     
-    // 2
+    fileprivate func fetchData() {
+        print("Fetching new JSON DATA somehow...")
+        Service.shared.fetchGames { (appGroup, error) in
+            
+            
+        }
+        
+    }
+    
+    // 2 Header
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: AppsPageHeader.reuseId, for: indexPath)
         return header
     }
     
-    // 3
+    // 3 Header
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return .init(width: view.frame.width, height: 300)
     }
