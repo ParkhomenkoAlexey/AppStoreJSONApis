@@ -15,7 +15,7 @@ struct Constants {
     static let lineSpacing: CGFloat = 10
 }
 
-class AppsHorizontalController: UICollectionViewController {
+class AppsHorizontalController: HorizontalSnappingController {
     
     var appGroup: AppGroup?
     
@@ -25,6 +25,8 @@ class AppsHorizontalController: UICollectionViewController {
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.showsVerticalScrollIndicator = false
         collectionView.register(AppRowCell.self, forCellWithReuseIdentifier: AppRowCell.reuseid)
+        collectionView.contentInset = .init(top: 0, left: Constants.leftRightPadding, bottom: 0, right: Constants.leftRightPadding)
+        
     }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -41,22 +43,14 @@ class AppsHorizontalController: UICollectionViewController {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return .init(top: Constants.topBottomPadding, left: Constants.leftRightPadding, bottom: Constants.topBottomPadding, right: Constants.leftRightPadding)
+        return .init(top: Constants.topBottomPadding, left: 0, bottom: Constants.topBottomPadding, right: 0)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return Constants.lineSpacing
     }
     
-    init() {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        super.init(collectionViewLayout: layout)
-    }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 }
 
 extension AppsHorizontalController: UICollectionViewDelegateFlowLayout {

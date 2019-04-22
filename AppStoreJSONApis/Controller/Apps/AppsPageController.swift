@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class AppsPageController: UICollectionViewController {
+class AppsPageController: BaseListController {
     
     var groups = [AppGroup]()
     var socialApps = [SocialApp]()
@@ -114,15 +114,6 @@ class AppsPageController: UICollectionViewController {
         return .init(width: view.frame.width, height: 300)
     }
     
-    init() {
-        let layout = UICollectionViewFlowLayout()
-        super.init(collectionViewLayout: layout)
-        
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 }
 
 extension AppsPageController: UICollectionViewDelegateFlowLayout {
