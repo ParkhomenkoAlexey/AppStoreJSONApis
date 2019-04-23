@@ -15,9 +15,18 @@ struct Constants {
     static let lineSpacing: CGFloat = 10
 }
 
+// второй способ
+protocol DetailPageTappedDelegate: class {
+    func push(feedResult: FeedResult)
+}
+
 class AppsHorizontalController: HorizontalSnappingController {
     
     var appGroup: AppGroup?
+    
+    var didSelectHandler: ((FeedResult) -> ())?
+    
+    weak var delegate: DetailPageTappedDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,6 +49,14 @@ class AppsHorizontalController: HorizontalSnappingController {
         cell.nameLabel.text = app?.name
         cell.imageView.sd_setImage(with: URL(string: app?.artworkUrl100 ?? ""))
         return cell
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if let app = appGroup?.feed.results[indexPath.item] {
+            didSelectHandler?(app)
+            delegate?.push(feedResult: app)
+        }
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {

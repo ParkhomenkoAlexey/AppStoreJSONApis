@@ -93,8 +93,17 @@ class AppsPageController: BaseListController {
         cell.titleLabel.text = appGroup.feed.title
         cell.horizontalController.appGroup = appGroup
         cell.horizontalController.collectionView.reloadData()
+        cell.horizontalController.delegate = self
+        
+        cell.horizontalController.didSelectHandler = { [weak self] feedResult in
+            let controller = AppDetailController()
+            controller.view.backgroundColor = .white
+            controller.navigationItem.title = feedResult.name
+            self?.navigationController?.pushViewController(controller, animated: true)
+        }
         return cell
     }
+    
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return .init(top: 16, left: 0, bottom: 0, right: 0)
@@ -114,6 +123,17 @@ class AppsPageController: BaseListController {
         return .init(width: view.frame.width, height: 300)
     }
     
+}
+
+// второй способ
+extension AppsPageController: DetailPageTappedDelegate {
+    
+    func push(feedResult: FeedResult) {
+//        let controller = AppDetailController()
+//        controller.view.backgroundColor = .white
+//        controller.navigationItem.title = feedResult.name
+//        navigationController?.pushViewController(controller, animated: true)
+    }
 }
 
 extension AppsPageController: UICollectionViewDelegateFlowLayout {
